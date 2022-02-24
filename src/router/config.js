@@ -51,11 +51,12 @@ const options = {
             }
           ]
         },
+
         {
-          path: 'form',
-          name: '表单页',
+          path: 'copyright',
+          name: '版权信息管理',
           meta: {
-            icon: 'form',
+            icon: 'table',
             page: {
               cacheAble: false
             }
@@ -63,22 +64,114 @@ const options = {
           component: PageView,
           children: [
             {
-              path: 'basic',
-              name: '基础表单',
-              component: () => import('@/pages/form/basic'),
+              path: 'add',
+              name: '版权信息填写',
+              component: () => import('@/views/copyright/form/CopyrightForm'),
+              meta: {
+                icon: 'form',
+                page: {
+                  cacheAble: false
+                }
+              },
             },
             {
-              path: 'step',
-              name: '分步表单',
-              component: () => import('@/pages/form/step'),
+              path: 'query',
+              name: '版权信息列表',
+              meta: {
+                icon: 'table',
+                authority: 'queryForm',
+              },
+              component: () => import('@/views/copyright/list/CopyrightQueryList'),
+            },
+
+          ]
+        },
+        {
+          path: 'user',
+          name: '用户管理',
+          meta: {
+            icon: 'table'
+          },
+          component: PageView,
+          children: [
+            {
+              path: 'add',
+              name: '用户信息填写',
+              component: () => import('@/views/user/form'),
+              meta: {
+                icon: 'form',
+                page: {
+                  cacheAble: false
+                }
+              },
             },
             {
-              path: 'advance',
-              name: '高级表单',
-              component: () => import('@/pages/form/advance'),
+              path: 'query',
+              name: '用户列表',
+              meta: {
+                icon: 'table',
+                page: {
+                  cacheAble: false
+                },
+                authority: 'queryForm',
+              },
+
+              component: () => import('@/views/user/list/UserQueryList'),
+            },
+            {
+              path: 'query/detail/:id',
+              name: '查询详情',
+              meta: {
+                highlight: '/list/query',
+                invisible: true
+              },
+              component: () => import('@/pages/Demo')
             }
           ]
         },
+        {
+          path: 'verify',
+          name: '审核管理',
+          meta: {
+            icon: 'table'
+          },
+          component: PageView,
+          children: [
+            {
+              path: 'list',
+              name: '审核列表',
+              component: () => import('@/views/verify/list/VerifyQueryList'),
+              meta: {
+                icon: 'table',
+                page: {
+                  cacheAble: false
+                }
+              },
+            },
+            {
+              path: 'log/list',
+              name: '审核日志列表',
+              meta: {
+                icon: 'table',
+                page: {
+                  cacheAble: false
+                },
+                authority: 'queryForm',
+              },
+              component: () => import('@/views/verify/loglist/VerifyLogQueryList'),
+            },
+            {
+              path: 'query/detail/:id',
+              name: '查询详情',
+              meta: {
+                highlight: '/list/query',
+                invisible: true
+              },
+              component: () => import('@/pages/Demo')
+            }
+          ]
+        },
+
         {
           path: 'list',
           name: '列表页',
