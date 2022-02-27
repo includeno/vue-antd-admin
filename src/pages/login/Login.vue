@@ -16,7 +16,7 @@
                 autocomplete="autocomplete"
                 size="large"
                 placeholder="admin"
-                v-decorator="['name', {rules: [{ required: true, message: '请输入账户名', whitespace: true}]}]"
+                v-decorator="['email', {rules: [{ required: true, message: '请输入邮箱', whitespace: true}]}]"
               >
                 <a-icon slot="prefix" type="user" />
               </a-input>
@@ -49,7 +49,7 @@
 
 <script>
 import CommonLayout from '@/layouts/CommonLayout'
-import {login, getRoutesConfig} from '@/services/user'
+import {login, getRoutesConfig} from '@/services/UserService'
 import {setAuthorization} from '@/utils/request'
 import {loadRoutes} from '@/utils/routerUtil'
 import {mapMutations} from 'vuex'
@@ -76,9 +76,11 @@ export default {
       this.form.validateFields((err) => {
         if (!err) {
           this.logging = true
-          const name = this.form.getFieldValue('name')
-          const password = this.form.getFieldValue('password')
-          login(name, password).then(this.afterLogin)
+          const email = this.form.getFieldValue('email');
+          const password = this.form.getFieldValue('password');
+
+          console.log("email"+email+" password"+password);
+          login(email, password).then(this.afterLogin)
         }
       })
     },

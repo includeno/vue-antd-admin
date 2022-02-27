@@ -1,6 +1,16 @@
 module.exports = {
   messages: {
     CN: {
+      username:'用户名',
+      usernameInput:'请填写用户名',
+      password:'密码',
+      passwordInput:'请填写密码',
+      email:'电子邮箱',
+      emailInput:'请填写电子邮箱',
+
+      role:'角色',
+      roleSelect:'请选择角色',
+
       pageDesc: '表单页用于向用户收集或验证信息，基础表单常见于数据项较少的表单场景。',
       title: '标题',
       titleInput: '给目标起个名字',
@@ -26,6 +36,13 @@ module.exports = {
       colleague3: '同事丙'
     },
     HK: {
+      username:'用户名',
+      usernameInput:'请填写用户名',
+      password:'密码',
+      passwordInput:'请填写密码',
+      email:'电子邮箱',
+      emailInput:'请填写电子邮箱',
+
       pageDesc: '表單頁用於向用戶收集或驗證信息，基礎表單常見於數據項較少的表單場景。',
       title: '標題',
       titleInput: '給目標起個名字',
@@ -51,6 +68,13 @@ module.exports = {
       colleague3: '同事丙'
     },
     US: {
+      username:'username',
+      usernameInput:'please input username',
+      password:'password',
+      passwordInput:'please input password',
+      email:'email',
+      emailInput:'please input email',
+
       pageDesc: 'Form pages are used to collect or verify information to users, and basic forms are common in scenarios where there are fewer data items.',
       title: 'Title',
       titleInput: 'Give the target a name',

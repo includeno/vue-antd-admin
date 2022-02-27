@@ -4,7 +4,7 @@
  * @param route
  * @returns {Permission}
  */
-const getRoutePermission = (permissions, route) => permissions.find(item => item.id === route.meta.authority.permission)
+const getRoutePermission = (permissions, route) => permissions.find(permission => permission.id === route.meta.authority.permission)
 /**
  * 获取路由需要的角色
  * @param roles
@@ -13,7 +13,8 @@ const getRoutePermission = (permissions, route) => permissions.find(item => item
  */
 const getRouteRole = (roles, route) => {
   const requiredRoles = route.meta.authority.role
-  return requiredRoles ? roles.filter(item => requiredRoles.findIndex(required => required === item.id) !== -1) : []
+  //TODO 修改角色判断方案
+  return requiredRoles ? roles.filter(role => requiredRoles.findIndex(required => required === role.id) !== -1) : []
 }
 /**
  * 判断是否已为方法注入权限认证
@@ -53,6 +54,7 @@ const auth = function(authConfig, permission, role, permissions, roles) {
  */
 const checkFromPermission = function(check, permission) {
   return permission && permission.operation && permission.operation.indexOf(check) !== -1
+  //TODO 修改权限判断方案
 }
 
 /**

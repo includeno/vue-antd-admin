@@ -1,98 +1,158 @@
 <template>
   <a-card :body-style="{padding: '24px 32px'}" :bordered="false">
-    <a-form>
+    <a-form
+        id="user-add-form"
+        :form="form"
+        @submit="handleSubmit"
+    >
       <a-form-item
-        :label="$t('title')"
+        :label="$t('username')"
         :labelCol="{span: 7}"
         :wrapperCol="{span: 10}"
       >
-        <a-input :placeholder="$t('titleInput')" />
+        <a-input :placeholder="$t('usernameInput')" v-decorator="[
+          'username',
+          { rules: [{ required: true, message: $t('usernameInput') }] },
+        ]"
+        />
+      </a-form-item>
+
+      <a-form-item
+        :label="$t('password')"
+        :labelCol="{span: 7}"
+        :wrapperCol="{span: 10}"
+      >
+        <a-input :placeholder="$t('passwordInput')" v-decorator="[
+          'password',
+          { rules: [{ required: true, message: $t('passwordInput') }] },
+        ]"
+        />
       </a-form-item>
       <a-form-item
-        :label="$t('date')"
+        :label="$t('email')"
         :labelCol="{span: 7}"
         :wrapperCol="{span: 10}"
       >
-        <a-range-picker style="width: 100%" />
+        <a-input :placeholder="$t('emailInput')" v-decorator="[
+          'email',
+          { rules: [{ required: true, message: $t('emailInput') }] },
+        ]"
+        />
       </a-form-item>
+
       <a-form-item
-        :label="$t('describe')"
+        :label="$t('role')"
         :labelCol="{span: 7}"
         :wrapperCol="{span: 10}"
+        :required="true"
+        :help="$t('roleSelect')"
       >
-        <a-textarea rows="4" :placeholder="$t('describeInput')"/>
-      </a-form-item>
-      <a-form-item
-        :label="$t('metrics')"
-        :labelCol="{span: 7}"
-        :wrapperCol="{span: 10}"
-      >
-        <a-textarea rows="4" :placeholder="$t('metricsInput')"/>
-      </a-form-item>
-      <a-form-item
-        :label="$t('customer')"
-        :labelCol="{span: 7}"
-        :wrapperCol="{span: 10}"
-        :required="false"
-      >
-        <a-input :placeholder="$t('customerInput')"/>
-      </a-form-item>
-      <a-form-item
-        :label="$t('critics')"
-        :labelCol="{span: 7}"
-        :wrapperCol="{span: 10}"
-        :required="false"
-      >
-        <a-input :placeholder="$t('criticsInput')"/>
-      </a-form-item>
-      <a-form-item
-        :label="$t('weight')"
-        :labelCol="{span: 7}"
-        :wrapperCol="{span: 10}"
-        :required="false"
-      >
-        <a-input-number :min="0" :max="100"/>
-        <span>%</span>
-      </a-form-item>
-      <a-form-item
-        :label="$t('disclosure')"
-        :labelCol="{span: 7}"
-        :wrapperCol="{span: 10}"
-        :required="false"
-        :help="$t('disclosureDesc')"
-      >
-        <a-radio-group v-model="value">
-          <a-radio :value="1">{{$t('public')}}</a-radio>
-          <a-radio :value="2">{{$t('partially')}}</a-radio>
-          <a-radio :value="3">{{$t('private')}}</a-radio>
-        </a-radio-group>
-        <a-select mode="multiple" v-if="value === 2">
-          <a-select-option value="4">{{$t('colleague1')}}</a-select-option>
-          <a-select-option value="5">{{$t('colleague2')}}</a-select-option>
-          <a-select-option value="6">{{$t('colleague3')}}</a-select-option>
+        <a-select
+
+            style="width: 200px"
+            :default-active-first-option="false"
+            :show-arrow="true"
+            :filter-option="false"
+            :not-found-content="null"
+            @search="handleSearch"
+            @change="handleChange"
+            v-decorator="[
+              'roleId',
+              { rules: [{ required: true, message: $t('roleSelect') }] },
+            ]"
+        >
+          <a-select-option v-for="d in data" :key="d.value">
+            {{ d.text }}
+          </a-select-option>
         </a-select>
+
       </a-form-item>
       <a-form-item style="margin-top: 24px" :wrapperCol="{span: 10, offset: 7}">
-        <a-button type="primary">{{$t('submit')}}</a-button>
-        <a-button style="margin-left: 8px">{{$t('save')}}</a-button>
+        <a-button type="primary" html-type="submit">{{$t('submit')}}</a-button>
       </a-form-item>
     </a-form>
   </a-card>
 </template>
 
 <script>
+import {UserService} from '../../../services'
+let timeout;
+
+function getRoleList(callback) {
+  if (timeout) {
+    clearTimeout(timeout);
+    timeout = null;
+  }
+
+  function loadData() {
+    UserService.getRoleList().then((response)=>{
+      const result = response.data.data;
+      console.log("result:"+JSON.stringify(result))
+      const data = [];
+      result.forEach(r => {
+        data.push({
+          value: r["roleId"],
+          text: r["rolename"],
+        });
+      });
+      callback(data);
+    });
+  }
+  timeout = setTimeout(loadData, 300);
+}
+
 export default {
   name: 'UserForm',
   i18n: require('./i18n'),
+  beforeCreate() {
+    this.form = this.$form.createForm(this, {name: 'normal_login'});
+  },
+  mounted() {
+    getRoleList(data => (this.data = data));
+  },
   data () {
     return {
-      value: 1
+      data: [],
+      value: undefined,
     }
   },
+  methods:{
+    async handleSubmit(e) {
+      e.preventDefault();
+
+      this.form.validateFields(async (err, values) => {
+        if (!err) {
+          let response=await UserService.register(values.username,values.password,values.email,values.roleId)
+          if(response!=null && response.data!=null){
+            if(response.data.code<0){
+              this.$message.error(response.data.message);
+              this.form.resetFields("password")
+            }
+            else{
+              this.$message.info(response.data.message);
+              this.form.resetFields("username")
+              this.form.resetFields("password")
+              this.form.resetFields("email")
+              this.form.resetFields("roleId")
+            }
+          }
+          else{
+            this.$message.error('服务器错误')
+          }
+        }
+      });
+
+    },
+
+    handleSearch(value) {
+      this.value=value;
+    },
+    handleChange(value) {
+      this.value=value;
+    },
+  },
   computed: {
-    desc() {
-      return this.$t('pageDesc')
-    }
+
   }
 }
 </script>

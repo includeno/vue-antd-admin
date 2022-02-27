@@ -1,8 +1,7 @@
 <template>
   <a-dropdown>
     <div class="header-avatar" style="cursor: pointer">
-      <a-avatar class="avatar" size="small" shape="circle" :src="user.avatar"/>
-      <span class="name">{{user.name}}</span>
+      <span class="name">{{user.username}}</span>
     </div>
     <a-menu :class="['avatar-menu']" slot="overlay">
       <a-menu-item>
@@ -24,7 +23,7 @@
 
 <script>
 import {mapGetters} from 'vuex'
-import {logout} from '@/services/user'
+import {logout} from '@/services/UserService'
 
 export default {
   name: 'HeaderAvatar',

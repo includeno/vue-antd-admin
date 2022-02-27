@@ -24,9 +24,9 @@ const activities = users.map((user, index) => {
 })
 
 const templates = [
-  (user, activity) => { return `${user.name} 在 <a >${user.group}</a> 新建项目 <a>${activity.event}</a>` },
-  (user, activity) => { return `${user.name} 在 <a >${user.group}</a> 发布了 <a>${activity.event}</a>` },
-  (user, activity) => { return `${user.name} 将 <a >${activity.event}</a> 更新至已发布状态` }
+  (user, activity) => { return `${user.username} 在 <a >${user.group}</a> 新建项目 <a>${activity.event}</a>` },
+  (user, activity) => { return `${user.username} 在 <a >${user.group}</a> 发布了 <a>${activity.event}</a>` },
+  (user, activity) => { return `${user.username} 将 <a >${activity.event}</a> 更新至已发布状态` }
 ]
 
 export {activities, templates}

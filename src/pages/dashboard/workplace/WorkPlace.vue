@@ -1,8 +1,8 @@
 <template>
-  <page-layout :avatar="currUser.avatar">
+  <page-layout >
     <div slot="headerContent">
-      <div class="title">{{welcome.timeFix[lang]}}，{{currUser.name}}，{{welcome.message[lang]}}</div>
-      <div>{{currUser.position[lang]}}</div>
+      <div class="title">{{welcome.timeFix[lang]}}，{{currUser.username}}，{{welcome.message[lang]}}</div>
+<!--      <div>{{currUser.position[lang]}}</div>-->
     </div>
     <template slot="extra">
       <head-info class="split-right" :title="$t('project')" content="56"/>
@@ -17,7 +17,6 @@
             <a-list>
               <a-list-item :key="index" v-for="(item, index) in activities">
                 <a-list-item-meta>
-                  <a-avatar slot="avatar" :src="item.user.avatar" />
                   <div slot="title" v-html="item.template" />
                   <div slot="description">9小时前</div>
                 </a-list-item-meta>

@@ -88,7 +88,7 @@ export default {
 ...
 ├── src
 │   └── services                # 数据服务模块
-│       ├── user.js             # 用户数据服务
+│       ├── UserService.js             # 用户数据服务
 │       ├── product.js          # 产品服务
 │       ...           
 │       ├── api.js              # api 地址管理

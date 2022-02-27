@@ -213,7 +213,7 @@ export default {
       }, 200)
     },
     pageName(page) {
-      return this.$t(getI18nKey(page.keyPath))
+      return this.$t(getI18nKey(page.keyPath));
     },
     /**
      * 添加监听器
