@@ -118,6 +118,7 @@ function loadRoutes(routesConfig) {
     if (routesConfig && routesConfig.length > 0) {
       const routes = parseRoutes(routesConfig, routerMap)
       const finalRoutes = mergeRoutes(basicOptions.routes, routes)
+
       formatRoutes(finalRoutes)
       router.options = {...router.options, routes: finalRoutes}
       router.matcher = new Router({...router.options, routes:[]}).matcher

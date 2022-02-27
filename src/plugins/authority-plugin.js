@@ -4,7 +4,11 @@
  * @param route
  * @returns {Permission}
  */
-const getRoutePermission = (permissions, route) => permissions.find(permission => permission.id === route.meta.authority.permission)
+const getRoutePermission = (permissions, route) => {
+  //console.log("getRoutePermission "+JSON.stringify(permissions))
+  //console.log("route.meta.authority "+JSON.stringify(route.meta.authority))
+  return permissions.find(permission => permission.operation === route.meta.authority.permission)
+}
 /**
  * 获取路由需要的角色
  * @param roles
@@ -13,8 +17,9 @@ const getRoutePermission = (permissions, route) => permissions.find(permission =
  */
 const getRouteRole = (roles, route) => {
   const requiredRoles = route.meta.authority.role
+
   //TODO 修改角色判断方案
-  return requiredRoles ? roles.filter(role => requiredRoles.findIndex(required => required === role.id) !== -1) : []
+  return requiredRoles ? roles.filter(role => requiredRoles.findIndex(required => required === role.code) !== -1) : []
 }
 /**
  * 判断是否已为方法注入权限认证
@@ -157,6 +162,8 @@ const AuthorityPlugin = {
         $auth(check, type) {
           const permissions = this.$store.getters['account/permissions']
           const roles = this.$store.getters['account/roles']
+          //console.log("$auth:"+JSON.stringify(permissions))
+          //console.log("$auth:"+JSON.stringify(roles))
           const permission = getRoutePermission(permissions, this.$route)
           const role = getRouteRole(roles, this.$route)
           return auth.apply(this, [{check, type}, permission, role, permissions, roles])

@@ -5,13 +5,15 @@
  * @returns {boolean|*}
  */
 function hasPermission(authority, permissions) {
+  //console.log("hasPermission permissions:"+JSON.stringify(permissions))
   let required = '*'
   if (typeof authority === 'string') {
     required = authority
   } else if (typeof authority === 'object') {
+    //console.log("hasPermission authority:"+JSON.stringify(authority))
     required = authority.permission
   }
-  return required === '*' || (permissions && permissions.findIndex(item => item === required || item.id === required) !== -1)
+  return required === '*' || (permissions && permissions.findIndex(permission => permission === required || permission.name === required) !== -1)
 }
 
 /**
@@ -20,6 +22,8 @@ function hasPermission(authority, permissions) {
  * @param roles 用户角色集合
  */
 function hasRole(authority, roles) {
+  //console.log("hasRole authority:"+JSON.stringify(authority))
+  //console.log("hasRole roles:"+JSON.stringify(roles))
   let required = undefined
   if (typeof authority === 'object') {
     required = authority.role
@@ -38,10 +42,10 @@ function hasAnyRole(required, roles) {
     return false
   } else if(Array.isArray(required)) {
     return roles.findIndex(role => {
-      return required.findIndex(item => item === role || item === role.id) !== -1
+      return required.findIndex(item => item === role || item === role.code) !== -1
     }) !== -1
   } else {
-    return roles.findIndex(role => role === required || role.id === required) !== -1
+    return roles.findIndex(role => role === required || role.code === required) !== -1
   }
 }
 

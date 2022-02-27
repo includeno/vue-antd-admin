@@ -78,8 +78,6 @@ export default {
           this.logging = true
           const email = this.form.getFieldValue('email');
           const password = this.form.getFieldValue('password');
-
-          console.log("email"+email+" password"+password);
           login(email, password).then(this.afterLogin)
         }
       })
@@ -89,10 +87,15 @@ export default {
       const loginRes = res.data
       if (loginRes.code >= 0) {
         const {user, permissions, roles} = loginRes.data
+
+
         this.setUser(user)
         this.setPermissions(permissions)
         this.setRoles(roles)
-        setAuthorization({token: loginRes.data.token, expireAt: new Date(loginRes.data.expireAt)})
+        this.$store.commit('account/setPermissions', permissions)
+        this.$store.commit('account/setRoles', roles)
+
+        setAuthorization({token: 'Authorization:' + Math.random(), expireAt: new Date(new Date().getTime() + 60 * 1000)})
         // 获取路由配置
         getRoutesConfig().then(result => {
           const routesConfig = result.data.data
