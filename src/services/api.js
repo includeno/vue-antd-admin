@@ -10,6 +10,11 @@ module.exports = {
   //role
   ROLES: `${BASE_URL}/roles`,//仅获取
 
+  //copyright
+  COPYRIGHT_REQUEST: `${BASE_URL}/copyrightrequest`,//添加请求 修改请求 删除请求
+  COPYRIGHT_REQUEST_LIST:`${BASE_URL}/copyrightrequests/page`,//查询请求
+  COPYRIGHT_LIST: `${BASE_URL}/copyrights/page`,//查询记录
+
   ROUTES: `${BASE_URL}/routes`,
   GOODS: `${BASE_URL}/goods`,
   GOODS_COLUMNS: `${BASE_URL}/columns`,

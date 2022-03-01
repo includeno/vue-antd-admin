@@ -81,6 +81,7 @@
 </template>
 
 <script>
+import CopyrightRequestService from "../../../services/CopyrightRequestService";
 export default {
   name: 'CopyrightForm',
   i18n: require('./i18n'),

@@ -65,8 +65,8 @@ const options = {
           children: [
             {
               path: 'add',
-              name: '版权信息填写',
-              component: () => import('@/views/copyright/form/CopyrightForm'),
+              name: '版权请求信息填写',
+              component: () => import('@/views/copyrightcommit/form/CopyrightCommitForm'),
               meta: {
                 icon: 'form',
                 page: {
@@ -75,12 +75,12 @@ const options = {
               },
             },
             {
-              path: 'query',
-              name: '版权信息列表',
+              path: 'list',
+              name: '版权请求信息列表',
               meta: {
                 icon: 'table',
               },
-              component: () => import('@/views/copyright/list/CopyrightQueryList'),
+              component: () => import('@/views/copyrightcommit/list/CopyrightCommitQueryList'),
             },
           ]
         },

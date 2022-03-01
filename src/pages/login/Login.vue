@@ -94,8 +94,9 @@ export default {
         this.setRoles(roles)
         this.$store.commit('account/setPermissions', permissions)
         this.$store.commit('account/setRoles', roles)
+        this.$store.commit('account/setUser', user)
 
-        setAuthorization({token: 'Authorization:' + Math.random(), expireAt: new Date(new Date().getTime() + 60 * 1000)})
+        setAuthorization({token: 'Authorization:' + Math.random(), expireAt: new Date(new Date().getTime() + 60*5 * 1000)})
         // 获取路由配置
         getRoutesConfig().then(result => {
           const routesConfig = result.data.data
