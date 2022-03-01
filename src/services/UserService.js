@@ -1,4 +1,4 @@
-import {LOGIN,REGISTER,ROLES, ROUTES} from '@/services/api'
+import {LOGIN,REGISTER,ROLES, USER_LIST,ROUTES} from '@/services/api'
 import {request, METHOD, removeAuthorization} from '@/utils/request'
 
 /**
@@ -41,6 +41,15 @@ export async function getRoutesConfig() {
   return request(ROUTES, METHOD.GET)
 }
 
+export async function getUserListByPage(page,size,{username,email}) {
+  return request(USER_LIST, METHOD.GET,{
+    page:page,
+    size:size,
+    username:username,
+    email:email,
+  })
+}
+
 /**
  * 退出登录
  */
@@ -54,6 +63,7 @@ export default {
   login,
   register,
   getRoleList,
+  getUserListByPage,
   logout,
   getRoutesConfig
 }
