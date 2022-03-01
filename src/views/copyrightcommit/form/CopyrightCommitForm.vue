@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import CopyrightRequestService from "../../../services/CopyrightRequestService";
+import CopyrightRequestService from "../../../services/CopyrightCommitService";
 export default {
   name: 'CopyrightCommitForm',
   i18n: require('./i18n'),

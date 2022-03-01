@@ -43,12 +43,16 @@ export async function deleteCopyrightRequest(id, userId,email) {
  * 获取所有请求
  * @returns {Promise<AxiosResponse<T>>}
  */
-export async function getCopyrightRequestListByPage(page,size,{email,url,deleted}) {
+export async function getCopyrightRequestListByPage(page,size,{url,email,userId,status,deleted}) {
+    console.log("getCopyrightRequestListByPage:");
+    console.log({email,url,userId,status,deleted});
     return request(COPYRIGHT_REQUEST_LIST, METHOD.GET,{
         page:page,
         size:size,
         email:email,
+        userId:userId,
         url:url,
+        status:status,
         deleted:deleted,
     })
 }

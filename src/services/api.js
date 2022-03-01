@@ -11,8 +11,8 @@ module.exports = {
   ROLES: `${BASE_URL}/roles`,//仅获取
 
   //copyright
-  COPYRIGHT_REQUEST: `${BASE_URL}/copyrightrequest`,//添加请求 修改请求 删除请求
-  COPYRIGHT_REQUEST_LIST:`${BASE_URL}/copyrightrequests/page`,//查询请求
+  COPYRIGHT_REQUEST: `${BASE_URL}/copyrightcommit`,//添加请求 修改请求 删除请求
+  COPYRIGHT_REQUEST_LIST:`${BASE_URL}/copyrightcommits/page`,//查询请求
   COPYRIGHT_LIST: `${BASE_URL}/copyrights/page`,//查询记录
 
   ROUTES: `${BASE_URL}/routes`,
