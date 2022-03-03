@@ -8,7 +8,12 @@ const options = {
     {
       path: '/login',
       name: '登录页',
-      component: () => import('@/pages/login')
+      component: () => import('@/pages/login/Login')
+    },
+    {
+      path: '/register',
+      name: '注册页',
+      component: () => import('@/pages/login/Register')
     },
     {
       path: '*',

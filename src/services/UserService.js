@@ -15,7 +15,7 @@ export async function login(email, password) {
 }
 
 /**
- * 注册服务
+ * 管理员注册服务
  * @param username 账户名
  * @param password 账户密码
  * @returns {Promise<AxiosResponse<T>>}
@@ -26,6 +26,20 @@ export async function register(username, password,email,roleId) {
   formdata.append("email",email);
   formdata.append("password",password);
   formdata.append("roleId",roleId);
+  return request(REGISTER, METHOD.POST, formdata);
+}
+
+/**
+ * 普通用户注册服务
+ * @param username 账户名
+ * @param password 账户密码
+ * @returns {Promise<AxiosResponse<T>>}
+ */
+export async function registercommon(username, password,email) {
+  let formdata=new FormData();
+  formdata.append("username",username);
+  formdata.append("email",email);
+  formdata.append("password",password);
   return request(REGISTER, METHOD.POST, formdata);
 }
 
@@ -62,6 +76,7 @@ export function logout() {
 export default {
   login,
   register,
+  registercommon,
   getRoleList,
   getUserListByPage,
   logout,

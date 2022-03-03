@@ -8,11 +8,22 @@
     </div>
     <div class="login">
       <a-tabs size="large" :tabBarStyle="{textAlign: 'center'}" style="padding: 0 2px;">
-        <a-tab-pane tab="账户密码登录" key="1">
-          <a-form @submit="onSubmit" :form="form">
+
+        <a-tab-pane tab="账户注册" key="1">
+          <a-form @submit="onRegister" :form="registerform">
 
             <a-alert type="error" :closable="true" v-show="error" :message="error" showIcon
                      style="margin-bottom: 24px;"/>
+            <a-form-item>
+              <a-input
+                  autocomplete="autocomplete"
+                  size="large"
+                  placeholder="username"
+                  v-decorator="['username', {rules: [{ required: true, message: '请输入用户名', whitespace: true}]}]"
+              >
+                <a-icon slot="prefix" type="user"/>
+              </a-input>
+            </a-form-item>
             <a-form-item>
               <a-input
                   autocomplete="autocomplete"
@@ -26,10 +37,22 @@
             <a-form-item>
               <a-input
                   size="large"
-                  placeholder="password"
+                  placeholder="请输入密码"
                   autocomplete="autocomplete"
                   type="password"
-                  v-decorator="['password', {rules: [{ required: true, message: '请输入密码', whitespace: true}]}]"
+                  v-decorator="['password1', {rules: [{ required: true, message: '请输入密码', whitespace: true}]}]"
+              >
+                <a-icon slot="prefix" type="lock"/>
+              </a-input>
+            </a-form-item>
+
+            <a-form-item>
+              <a-input
+                  size="large"
+                  placeholder="请再次输入密码"
+                  autocomplete="autocomplete"
+                  type="password"
+                  v-decorator="['password2', {rules: [{ required: true, message: '请再次输入密码', whitespace: true}]}]"
               >
                 <a-icon slot="prefix" type="lock"/>
               </a-input>
@@ -37,12 +60,11 @@
 
             <a-form-item>
               <a-button :loading="logging" style="width: 100%;margin-top: 24px" size="large" htmlType="submit"
-                        type="primary">登录
+                        type="primary">注册
               </a-button>
             </a-form-item>
           </a-form>
         </a-tab-pane>
-
       </a-tabs>
 
     </div>
@@ -51,13 +73,10 @@
 
 <script>
 import CommonLayout from '@/layouts/CommonLayout'
-import {login, getRoutesConfig} from '@/services/UserService'
-import {setAuthorization} from '@/utils/request'
-import {loadRoutes} from '@/utils/routerUtil'
-import {mapMutations} from 'vuex'
+import {registercommon} from '@/services/UserService'
 
 export default {
-  name: 'Login',
+  name: 'Register',
   components: {CommonLayout},
   data() {
     return {
@@ -67,6 +86,7 @@ export default {
   },
   beforeCreate() {
     this.form = this.$form.createForm(this, {name: 'login'});
+    this.registerform = this.$form.createForm(this, {name: 'register'});
   },
   computed: {
     systemName() {
@@ -74,46 +94,41 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('account', ['setUser', 'setPermissions', 'setRoles']),
-    onSubmit(e) {
+
+    onRegister(e){
       e.preventDefault()
-      this.form.validateFields((err) => {
+      this.registerform.validateFields((err) => {
         if (!err) {
-          this.logging = true
-          const email = this.form.getFieldValue('email');
-          const password = this.form.getFieldValue('password');
-          login(email, password).then(this.afterLogin)
+          this.logging = true;
+          const username = this.registerform.getFieldValue('username');
+          const email = this.registerform.getFieldValue('email');
+          const password1 = this.registerform.getFieldValue('password1');
+          const password2 = this.registerform.getFieldValue('password2');
+          if(password1!=password2){
+            this.$error("两次密码不一致");
+          }
+          else{
+            registercommon(username,email, password1).then(this.afterRegister)
+          }
         }
       })
     },
-    afterLogin(res) {
-      this.logging = false
+    afterRegister(res) {
+      this.logging = false;
       const loginRes = res.data
       if (loginRes.code >= 0) {
-        const {user, permissions, roles} = loginRes.data
-        this.setUser(user)
-        this.setPermissions(permissions)
-        this.setRoles(roles)
-        this.$store.commit('account/setPermissions', permissions)
-        this.$store.commit('account/setRoles', roles)
-        this.$store.commit('account/setUser', user)
-
-        setAuthorization({
-          token: 'Authorization:' + Math.random(),
-          expireAt: new Date(new Date().getTime() + 60 * 5 * 1000)
-        })
-        // 获取路由配置
-        getRoutesConfig().then(result => {
-          const routesConfig = result.data.data
-          loadRoutes(routesConfig)
-          this.$router.push('/dashboard/workplace')
-          this.$message.success(loginRes.message, 3)
-        })
+        this.registerform.resetFields("username")
+        this.registerform.resetFields("email")
+        this.registerform.resetFields("password1")
+        this.registerform.resetFields("password2")
+        this.$info("注册成功")
+        this.$router.push('/login');
       } else {
-        this.error = loginRes.message
+        this.registerform.resetFields("password1")
+        this.registerform.resetFields("password2")
+        this.$error(loginRes.message);
       }
     },
-
   }
 }
 </script>
