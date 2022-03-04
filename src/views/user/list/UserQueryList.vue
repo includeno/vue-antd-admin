@@ -66,7 +66,7 @@
           <router-link :to="`/user/detail/${record.id}`">详情</router-link>
           <a style="margin-right: 8px">
             <a-icon type="edit"/>
-            编辑
+            <router-link :to="`/user/update/${record.id}`">编辑</router-link>
           </a>
           <a @click="deleteRecord(record.id)">
             <a-icon type="delete"/>

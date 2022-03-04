@@ -114,7 +114,6 @@ const options = {
                 },
                 authority: {
                   role:["admin"],
-                  permission:["user:add"]
                 },
               },
             },
@@ -143,6 +142,17 @@ const options = {
                 invisible: true,
               },
               component: () => import('@/views/user/detail/UserDetail')
+            },
+            {
+              path: 'update/:id',
+              name: '用户信息更新',
+              meta: {
+                authority: {
+                  role:["admin"],
+                },
+                invisible: true,
+              },
+              component: () => import('@/views/user/update/UserUpdateForm')
             }
           ]
         },
