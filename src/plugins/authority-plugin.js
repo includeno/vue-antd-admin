@@ -38,6 +38,11 @@ const hasInjected = (method) => method.toString().indexOf('//--auth-inject') !==
  * @returns {boolean}
  */
 const auth = function(authConfig, permission, role, permissions, roles) {
+  console.log("auth authConfig"+JSON.stringify(authConfig))
+  console.log("auth permission"+JSON.stringify(permission))
+  console.log("auth role"+JSON.stringify(role))
+  console.log("auth permissions"+JSON.stringify(permissions))
+  console.log("auth roles"+JSON.stringify(roles))
   const {check, type} = authConfig
   if (check && typeof check === 'function') {
     return check.apply(this, [permission, role, permissions, roles])
@@ -45,9 +50,9 @@ const auth = function(authConfig, permission, role, permissions, roles) {
   if (type === 'permission') {
     return checkFromPermission(check, permission)
   } else if (type === 'role') {
-    return checkFromRoles(check, role)
+    return checkFromRoles(check, roles)
   } else {
-    return checkFromPermission(check, permission) || checkFromRoles(check, role)
+    return checkFromPermission(check, permission) || checkFromRoles(check, roles)
   }
 }
 
@@ -72,10 +77,19 @@ const checkFromRoles = function(check, roles) {
   if (!roles) {
     return false
   }
+  console.log("checkFromRoles roles:"+JSON.stringify(roles));
+  console.log("checkFromRoles check:"+JSON.stringify(check));
+  //let rolesSet=new Set(roles);
+  console.log("checkFromRoles roles:"+JSON.stringify(new Set(roles.map(a=>a.code))));
+  console.log("checkFromRoles check:"+JSON.stringify(new Set(check)));
+
   for (let role of roles) {
-    const {operation} = role
-    if (operation && operation.indexOf(check) !== -1) {
-      return true
+    console.log("checkFromRoles role:"+JSON.stringify(role));
+    for(let item in check){
+      if(check[item]==role.code){
+        console.log("=====")
+        return true;
+      }
     }
   }
   return false
@@ -125,13 +139,28 @@ const AuthorityPlugin = {
       beforeCreate() {
         if (this.$options.authorize) {
           const authorize = this.$options.authorize
+          console.log("authorize:"+JSON.stringify(authorize));
           Object.keys(authorize).forEach(key => {
             if (this.$options.methods[key]) {
               const method = this.$options.methods[key]
               if (!hasInjected(method)) {
                 let authConfig = authorize[key]
-                authConfig = (typeof authConfig === 'string') ? {check: authConfig} : authConfig
+                if(typeof authConfig === 'string'){
+                  authConfig={check: authConfig}
+                }
+                else if(Array.isArray(authConfig)){
+                  authConfig={check:authConfig}
+                }
+                else if(authConfig.role!=null){
+                  authConfig={check:authConfig.role,type:'role'}
+                }
+                else if(authConfig.permission!=null){
+                  authConfig={check:authConfig.permission,type:'permission'}
+                }
                 const {check, type, onFailure} = authConfig
+                console.log("authConfig:"+JSON.stringify(authConfig));
+                console.log("check:"+JSON.stringify(check));
+                console.log("type:"+JSON.stringify(type));
                 this.$options.methods[key] = function () {
                   //--auth-inject
                   if (this.$auth(check, type)) {
@@ -139,6 +168,7 @@ const AuthorityPlugin = {
                   } else {
                     if (onFailure && typeof onFailure === 'function') {
                       this[`$${check}Failure`] = onFailure
+                      this.$message.error(`对不起，您没有操作权限222：${check}`)
                       return this[`$${check}Failure`](check)
                     } else {
                       this.$message.error(`对不起，您没有操作权限：${check}`)

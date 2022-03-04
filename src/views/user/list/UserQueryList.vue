@@ -30,9 +30,9 @@
                   :labelCol="{span: 5}"
                   :wrapperCol="{span: 18, offset: 1}"
               >
-                <a-select placeholder="请选择">
-                  <a-select-option value="1">关闭</a-select-option>
-                  <a-select-option value="0">运行中</a-select-option>
+                <a-select v-decorator="['deleted', {rules: [{ required: false, message: '请选择', whitespace: true}]}]">
+                  <a-select-option value="0">有效</a-select-option>
+                  <a-select-option value="1">无效</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -63,23 +63,16 @@
           {{ text }}
         </div>
         <div slot="action" slot-scope="{text, record}">
-          <a style="margin-right: 8px">
-            <a-icon type="plus"/>
-            新增
-          </a>
+          <router-link :to="`/user/detail/${record.id}`">详情</router-link>
           <a style="margin-right: 8px">
             <a-icon type="edit"/>
             编辑
           </a>
-          <a @click="deleteRecord(record.key)">
+          <a @click="deleteRecord(record.id)">
             <a-icon type="delete"/>
-            删除1
+            删除
           </a>
-          <a @click="deleteRecord(record.key)" v-auth="`delete`">
-            <a-icon type="delete"/>
-            删除2
-          </a>
-          <router-link :to="`/list/query/detail/${record.key}`">详情</router-link>
+
         </div>
         <template slot="statusTitle">
           <a-icon @click.native="onStatusTitleClick" type="info-circle"/>
@@ -116,24 +109,19 @@ const columns = [
     sorter: true
   },
   {
-    dataIndex: 'status',
-    needTotal: true,
-    slots: {title: 'statusTitle'}
-  },
-  {
     title: '操作',
     scopedSlots: {customRender: 'action'}
   }
 ]
 let timeout;
 
-function getUserListByPage(callback,current,size,{username,email}) {
+function getUserListByPage(callback,current,size,{username,email,deleted}) {
   if (timeout) {
     clearTimeout(timeout);
     timeout = null;
   }
-  function loadData(current,size,{username,email}) {
-    UserService.getUserListByPage(current,size,{username,email}).then((response)=>{
+  function loadData(current,size,{username,email,deleted}) {
+    UserService.getUserListByPage(current,size,{username,email,deleted}).then((response)=>{
       if(response!=null && response.data.code>0){
         const records=response.data.data.records;
         const totals=response.data.data.total;
@@ -154,7 +142,7 @@ function getUserListByPage(callback,current,size,{username,email}) {
       }
     });
   }
-  timeout = setTimeout(loadData(current,size,{username:username,email:email}), 300);
+  timeout = setTimeout(loadData(current,size,{username:username,email:email,deleted:deleted}), 300);
 }
 
 export default {
@@ -165,6 +153,7 @@ export default {
       form: this.$form.createForm(this),
       username:undefined,
       email:undefined,
+      deleted:undefined,
 
       advanced: true,
       columns: columns,
@@ -183,10 +172,10 @@ export default {
   //   deleteRecord: 'delete'
   // },
   mounted() {
-    this.loadData(null,null);
+    this.loadData(null,null,null);
   },
   methods: {
-    loadData(username,email){
+    loadData(username,email,deleted){
       getUserListByPage((data,totals) => {
         this.dataSource=data;
         this.total=totals;
@@ -195,7 +184,7 @@ export default {
           pageSize:10,
           showTotal: total => `Total ${total} items`, // 显示总数
         }
-      },this.current,this.pageSize,{username:username,email:email});
+      },this.current,this.pageSize,{username:username,email:email,deleted:deleted});
     },
     onSubmit (e) {
       e.preventDefault()
@@ -203,6 +192,7 @@ export default {
         if (!err) {
           const username = this.form.getFieldValue('username');
           const email = this.form.getFieldValue('email');
+          const deleted = this.form.getFieldValue('deleted');
           if(username!=""){
             this.username=username;
           }
@@ -215,13 +205,14 @@ export default {
           else{
             this.email=null;
           }
-          this.loadData(this.username,this.email);
+          this.deleted=deleted;
+          this.loadData(this.username,this.email,this.deleted);
         }
       })
     },
-    deleteRecord(key) {
-      this.dataSource = this.dataSource.filter(item => item.key !== key)
-      this.selectedRows = this.selectedRows.filter(item => item.key !== key)
+    deleteRecord(id) {
+      this.dataSource = this.dataSource.filter(item => item.id !== id)
+      this.selectedRows = this.selectedRows.filter(item => item.id !== id)
     },
     toggleAdvanced() {
       this.advanced = !this.advanced
@@ -230,11 +221,13 @@ export default {
       this.dataSource = this.dataSource.filter(item => this.selectedRows.findIndex(row => row.key === item.key) === -1)
       this.selectedRows = []
     },
-    onClear() {
+    onClear(data) {
       this.$message.info('您清空了勾选的所有行')
+      console.log("onClear(data):"+JSON.stringify(data));
     },
-    onStatusTitleClick() {
+    onStatusTitleClick(data) {
       this.$message.info('你点击了状态栏表头')
+      console.log("onStatusTitleClick:"+JSON.stringify(data));
     },
     onChange({current,pageSize}) {
       this.current=current;

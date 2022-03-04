@@ -4,6 +4,7 @@
 const BASE_URL = process.env.VUE_APP_API_BASE_URL
 module.exports = {
   //user
+  USER:`${BASE_URL}/user`,
   LOGIN: `${BASE_URL}/user/login`,
   REGISTER: `${BASE_URL}/user/register`,
   USER_LIST: `${BASE_URL}/users/page`,

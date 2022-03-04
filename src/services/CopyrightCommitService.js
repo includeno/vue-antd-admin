@@ -1,8 +1,17 @@
 import {COPYRIGHT_REQUEST,COPYRIGHT_REQUEST_LIST} from '@/services/api'
 import {request, METHOD} from '@/utils/request'
 
+
 /**
- * 提交新的版权申请
+ * 获取版权信息申请
+ * @returns {Promise<AxiosResponse<T>>}
+ */
+export async function getCopyrightRequest(id) {
+    return request(COPYRIGHT_REQUEST, METHOD.GET,{id:id});
+}
+
+/**
+ * 提交新的版权信息申请
  * @returns {Promise<AxiosResponse<T>>}
  */
 export async function addCopyrightRequest(userId,url,platform,platformHash,comment) {
@@ -17,7 +26,7 @@ export async function addCopyrightRequest(userId,url,platform,platformHash,comme
 }
 
 /**
- * 修改版权申请
+ * 修改版权信息申请
  * @returns {Promise<AxiosResponse<T>>}
  */
 export async function updateCopyrightRequest(id,userId,email,platform,platformHash,comment) {
@@ -31,11 +40,10 @@ export async function updateCopyrightRequest(id,userId,email,platform,platformHa
     return request(COPYRIGHT_REQUEST, METHOD.PUT, formdata);
 }
 
-export async function deleteCopyrightRequest(id, userId,email) {
+export async function deleteCopyrightRequest(id, userId) {
     return request(COPYRIGHT_REQUEST, METHOD.DELTET, {
         id:id,
         userId:userId,
-        email:email,
     });
 }
 
@@ -44,8 +52,6 @@ export async function deleteCopyrightRequest(id, userId,email) {
  * @returns {Promise<AxiosResponse<T>>}
  */
 export async function getCopyrightRequestListByPage(page,size,{url,email,userId,status,deleted}) {
-    console.log("getCopyrightRequestListByPage:");
-    console.log({email,url,userId,status,deleted});
     return request(COPYRIGHT_REQUEST_LIST, METHOD.GET,{
         page:page,
         size:size,
@@ -58,6 +64,7 @@ export async function getCopyrightRequestListByPage(page,size,{url,email,userId,
 }
 
 export default {
+    getCopyrightRequest,
     addCopyrightRequest,
     updateCopyrightRequest,
     deleteCopyrightRequest,

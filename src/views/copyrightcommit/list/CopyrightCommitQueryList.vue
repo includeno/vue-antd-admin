@@ -77,13 +77,14 @@
           {{text}}
         </div>
         <div slot="action" slot-scope="{text, record}">
+          <router-link :to="`/copyright/detail/${record.id}`" >详情</router-link>
           <a style="margin-right: 8px">
             <a-icon type="edit"/>编辑
           </a>
-          <a @click="deleteRecord(record.key)">
-            <a-icon type="delete" />删除1
+          <a @click="deleteRecord(record.id)">
+            <a-icon type="delete" />删除
           </a>
-          <router-link :to="`/list/query/detail/${record.key}`" >详情</router-link>
+
         </div>
         <template slot="statusTitle">
           <a-icon @click.native="onStatusTitleClick" type="info-circle" />
@@ -102,7 +103,6 @@ const columns = [
   {
     title: '网页链接',
     dataIndex: 'url',
-    scopedSlots: {customRender: 'description'}
   },
   {
     title: '状态',
@@ -113,20 +113,13 @@ const columns = [
     dataIndex: 'platform',
   },
   {
-    title: '平台Hash',
-    dataIndex: 'platformHash',
-  },
-  {
     title: '创建时间',
     dataIndex: 'createTime',
-    sorter: true
   },
   {
     title: '更新时间',
     dataIndex: 'updateTime',
-    sorter: true
   },
-
   {
     title: '操作',
     scopedSlots: {customRender: 'action'}
@@ -146,13 +139,22 @@ function getCopyrightCommitListByPage(callback,current,size,{url,email,userId,st
         const totals=response.data.data.total;
         const data = [];
         records.forEach(r => {
+          let status=undefined;
+          if(r.status==1){
+            status ='已通过审核'
+          }
+          else if(r.status==-1){
+            status ='未通过审核'
+          }
+          else{
+            status ='待审核'
+          }
           data.push({
             id: r["id"],
             userId: r["userId"],
             url: r["url"],
             platform: r["platform"],
-            platformHash: r["platformHash"],
-            status: r["status"],
+            status: status,
             createTime: dateutil.getDateStringFromTimestamp(r["createTime"]),
             updateTime: dateutil.getDateStringFromTimestamp(r["updateTime"]),
           });
@@ -194,19 +196,15 @@ export default {
     }
   },
   authorize: {
-    deleteRecord: 'delete'
-  },
-  beforeCreate() {
-
-    console.log("beforeCreate this.userId=:"+this.userId);
+      deleteRecord: {
+        role:["admin","audit"],
+      }
   },
   mounted() {
     let roles=this.$store.getters["account/roles"];
-    console.log(JSON.stringify(roles))
     let rolecode=""
     for(let index in roles){
       if(roles[index].code=='admin'||roles[index].code=='audit'){
-
         rolecode=roles[index].code;
         break;
       }
@@ -218,13 +216,10 @@ export default {
       let user=this.$store.getters["account/user"];
       this.userId=user.id;
     }
-    console.log("mounted this.userId=:"+this.userId);
     this.loadData(null,null,this.userId,null,null);
-    console.log("CopyrightCommitQueryList.vue");
   },
   methods: {
     loadData(url,email,userId,status,deleted){
-      console.log("loadData userId:"+userId)
       if(userId==-1){
         userId=null;
       }
@@ -275,15 +270,26 @@ export default {
         }
       })
     },
-    deleteRecord(key) {
-      this.dataSource = this.dataSource.filter(item => item.key !== key)
-      this.selectedRows = this.selectedRows.filter(item => item.key !== key)
+    deleteRecord(id) {
+      CopyrightCommitService.deleteCopyrightRequest(id,this.user.id).then((response)=>{
+        if(response!=null&&response.data!=null){
+          let res=response.data.code;
+          if(res>0){
+            this.dataSource = this.dataSource.filter(item => item.id !== id)
+            this.selectedRows = this.selectedRows.filter(item => item.id !== id)
+            this.$message.info("删除成功")
+          }
+          else{
+            this.$message.error(response.data.message);
+          }
+        }
+      })
     },
     toggleAdvanced () {
       this.advanced = !this.advanced
     },
     remove () {
-      this.dataSource = this.dataSource.filter(item => this.selectedRows.findIndex(row => row.key === item.key) === -1)
+      this.dataSource = this.dataSource.filter(item => this.selectedRows.findIndex(row => row.id === item.id) === -1)
       this.selectedRows = []
     },
     onClear() {
@@ -297,8 +303,7 @@ export default {
       this.pageSize=pageSize;
       this.loadData();
     },
-    onSelectChange(data) {
-      console.log(JSON.stringify(data))
+    onSelectChange() {
       this.$message.info('选中行改变了')
     },
     handleMenuClick (e) {

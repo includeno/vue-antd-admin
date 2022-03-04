@@ -1,76 +1,61 @@
 <template>
   <a-card>
     <div :class="advanced ? 'search' : null">
-      <a-form layout="horizontal">
+      <a-form layout="horizontal" @submit="onSubmit" :form="form">
         <div :class="advanced ? null: 'fold'">
           <a-row >
-          <a-col :md="8" :sm="24" >
-            <a-form-item
-              label="用户邮箱"
-              :labelCol="{span: 5}"
-              :wrapperCol="{span: 18, offset: 1}"
-            >
-              <a-input placeholder="请输入" />
-            </a-form-item>
-          </a-col>
-          <a-col :md="8" :sm="24" >
-            <a-form-item
-              label="使用状态"
-              :labelCol="{span: 5}"
-              :wrapperCol="{span: 18, offset: 1}"
-            >
-              <a-select placeholder="请选择">
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :md="8" :sm="24" >
-            <a-form-item
-              label="调用次数"
-              :labelCol="{span: 5}"
-              :wrapperCol="{span: 18, offset: 1}"
-            >
-              <a-input-number style="width: 100%" placeholder="请输入" />
-            </a-form-item>
-          </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item
+                  label="网页链接"
+                  :labelCol="{span: 5}"
+                  :wrapperCol="{span: 18, offset: 1}"
+              >
+                <a-input v-decorator="['url', {rules: [{ required: false, message: '请输入网页链接', whitespace: true}]}]"/>
+              </a-form-item>
+            </a-col>
+
+            <a-col :md="8" :sm="24" v-if="userId===-1">
+              <a-form-item
+                  label="用户邮箱"
+                  :labelCol="{span: 5}"
+                  :wrapperCol="{span: 18, offset: 1}"
+              >
+                <a-input v-decorator="['email', {rules: [{ required: false, message: '请输入邮箱', whitespace: true}]}]"/>
+              </a-form-item>
+            </a-col>
         </a-row>
           <a-row v-if="advanced">
           <a-col :md="8" :sm="24" >
             <a-form-item
-              label="更新日期"
+              label="状态"
               :labelCol="{span: 5}"
               :wrapperCol="{span: 18, offset: 1}"
             >
-              <a-date-picker style="width: 100%" placeholder="请输入更新日期" />
-            </a-form-item>
-          </a-col>
-          <a-col :md="8" :sm="24" >
-            <a-form-item
-              label="使用状态"
-              :labelCol="{span: 5}"
-              :wrapperCol="{span: 18, offset: 1}"
-            >
-              <a-select placeholder="请选择">
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
+              <a-select placeholder="请选择" v-decorator="['status', {rules: [{ required: false, message: '请输入网页链接', whitespace: true}]}]">
+                <a-select-option value="0">待审核</a-select-option>
+                <a-select-option value="1">审核通过</a-select-option>
+                <a-select-option value="-1">审核不通过</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
-          <a-col :md="8" :sm="24" >
-            <a-form-item
-              label="描述"
-              :labelCol="{span: 5}"
-              :wrapperCol="{span: 18, offset: 1}"
-            >
-              <a-input placeholder="请输入" />
-            </a-form-item>
-          </a-col>
+
+            <a-col :md="8" :sm="24" >
+              <a-form-item
+                  label="删除"
+                  :labelCol="{span: 5}"
+                  :wrapperCol="{span: 18, offset: 1}"
+              >
+                <a-select placeholder="请选择" v-decorator="['deleted', {rules: [{ required: false, message: '请输入网页链接', whitespace: true}]}]">
+                  <a-select-option value="0">有效</a-select-option>
+                  <a-select-option value="1">无效</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+
         </a-row>
         </div>
         <span style="float: right; margin-top: 3px;">
-          <a-button type="primary">查询</a-button>
-          <a-button style="margin-left: 8px">重置</a-button>
+          <a-button type="primary" htmlType="submit">查询</a-button>
           <a @click="toggleAdvanced" style="margin-left: 8px">
             {{advanced ? '收起' : '展开'}}
             <a-icon :type="advanced ? 'up' : 'down'" />
@@ -79,44 +64,24 @@
       </a-form>
     </div>
     <div>
-      <a-space class="operator">
-        <a-button @click="addNew" type="primary">新建</a-button>
-        <a-button >批量操作</a-button>
-        <a-dropdown>
-          <a-menu @click="handleMenuClick" slot="overlay">
-            <a-menu-item key="delete">删除</a-menu-item>
-            <a-menu-item key="audit">审批</a-menu-item>
-          </a-menu>
-          <a-button>
-            更多操作 <a-icon type="down" />
-          </a-button>
-        </a-dropdown>
-      </a-space>
       <standard-table
         :columns="columns"
         :dataSource="dataSource"
         :selectedRows.sync="selectedRows"
-        @clear="onClear"
+        :pagination="pagination"
         @change="onChange"
-        @selectedRowChange="onSelectChange"
       >
         <div slot="description" slot-scope="{text}">
           {{text}}
         </div>
         <div slot="action" slot-scope="{text, record}">
+          <router-link :to="`/audit/detail/${record.id}`" >详情</router-link>
+
+
           <a style="margin-right: 8px">
-            <a-icon type="plus"/>新增
+            <a-icon type="edit"/><router-link :to="`/audit/update/${record.id}`" >审核</router-link>
           </a>
-          <a style="margin-right: 8px">
-            <a-icon type="edit"/>编辑
-          </a>
-          <a @click="deleteRecord(record.key)">
-            <a-icon type="delete" />删除1
-          </a>
-          <a @click="deleteRecord(record.key)" v-auth="`delete`">
-            <a-icon type="delete" />删除2
-          </a>
-          <router-link :to="`/list/query/detail/${record.key}`" >详情</router-link>
+
         </div>
         <template slot="statusTitle">
           <a-icon @click.native="onStatusTitleClick" type="info-circle" />
@@ -128,50 +93,77 @@
 
 <script>
 import StandardTable from '@/components/table/StandardTable'
+import dateutil from "../../../utils/dateutil";
+import {CopyrightCommitService} from "../../../services";
+
 const columns = [
   {
-    title: '规则编号',
-    dataIndex: 'no'
+    title: '网页链接',
+    dataIndex: 'url',
   },
   {
-    title: '描述',
-    dataIndex: 'description',
-    scopedSlots: { customRender: 'description' }
-  },
-  {
-    title: '服务调用次数',
-    dataIndex: 'callNo',
-    sorter: true,
-    needTotal: true,
-    customRender: (text) => text + ' 次'
-  },
-  {
+    title: '状态',
     dataIndex: 'status',
-    needTotal: true,
-    slots: {title: 'statusTitle'}
+  },
+  {
+    title: '平台',
+    dataIndex: 'platform',
+  },
+  {
+    title: '创建时间',
+    dataIndex: 'createTime',
   },
   {
     title: '更新时间',
-    dataIndex: 'updatedAt',
-    sorter: true
+    dataIndex: 'updateTime',
   },
   {
     title: '操作',
-    scopedSlots: { customRender: 'action' }
+    scopedSlots: {customRender: 'action'}
   }
 ]
+let timeout;
 
-const dataSource = []
-
-for (let i = 0; i < 100; i++) {
-  dataSource.push({
-    key: i,
-    no: 'NO ' + i,
-    description: '这是一段描述',
-    callNo: Math.floor(Math.random() * 1000),
-    status: Math.floor(Math.random() * 10) % 4,
-    updatedAt: '2018-07-26'
-  })
+function getCopyrightCommitListByPage(callback,current,size,{url,email,userId,status,deleted}) {
+  if (timeout) {
+    clearTimeout(timeout);
+    timeout = null;
+  }
+  function loadData(current,size,{url,email,userId,status,deleted}) {
+    CopyrightCommitService.getCopyrightRequestListByPage(current,size,{url,email,userId,status,deleted}).then((response)=>{
+      if(response!=null && response.data.code>0){
+        const records=response.data.data.records;
+        const totals=response.data.data.total;
+        const data = [];
+        records.forEach(r => {
+          let status=undefined;
+          if(r.status==1){
+            status ='已通过审核'
+          }
+          else if(r.status==-1){
+            status ='未通过审核'
+          }
+          else{
+            status ='待审核'
+          }
+          data.push({
+            id: r["id"],
+            userId: r["userId"],
+            url: r["url"],
+            platform: r["platform"],
+            status: status,
+            createTime: dateutil.getDateStringFromTimestamp(r["createTime"]),
+            updateTime: dateutil.getDateStringFromTimestamp(r["updateTime"]),
+          });
+        });
+        callback(data,totals)
+      }
+      else{
+        callback([],0)
+      }
+    });
+  }
+  timeout = setTimeout(loadData(current,size,{url:url,email:email,userId:userId,status:status,deleted:deleted}), 300);
 }
 
 export default {
@@ -179,48 +171,117 @@ export default {
   components: {StandardTable},
   data () {
     return {
+      user:this.$store.getters["account/user"],
+      form: this.$form.createForm(this),
+      url:undefined,
+      email:undefined,
+      userId:-1,
+      status:undefined,
+      deleted:undefined,
+
       advanced: true,
       columns: columns,
-      dataSource: dataSource,
-      selectedRows: []
+      dataSource: [],
+      selectedRows: [],
+      current:1,
+      pageSize:10,
+      total:0,
+      pagination: {
+        pageSize:10,
+        showTotal: total => `Total ${total} items`, // 显示总数
+      }
     }
   },
   authorize: {
-    deleteRecord: 'delete'
+      deleteRecord: {
+        role:["admin","audit"],
+      }
+  },
+  mounted() {
+    let roles=this.$store.getters["account/roles"];
+    let rolecode=""
+    for(let index in roles){
+      if(roles[index].code=='admin'||roles[index].code=='audit'){
+        rolecode=roles[index].code;
+        break;
+      }
+    }
+    if(rolecode!=""){
+      this.userId=-1;
+    }
+    else{
+      let user=this.$store.getters["account/user"];
+      this.userId=user.id;
+    }
+    this.loadData(null,null,this.userId,null,null);
   },
   methods: {
-    deleteRecord(key) {
-      this.dataSource = this.dataSource.filter(item => item.key !== key)
-      this.selectedRows = this.selectedRows.filter(item => item.key !== key)
+    loadData(url,email,userId,status,deleted){
+      if(userId==-1){
+        userId=null;
+      }
+      getCopyrightCommitListByPage((data,totals) => {
+        this.dataSource=data;
+        this.total=totals;
+        this.pagination={
+          total:this.total,
+          pageSize:10,
+          showTotal: total => `Total ${total} items`, // 显示总数
+        }
+      },this.current,this.pageSize,{url:url,email:email,userId:userId,status:status,deleted:deleted});
     },
+    onSubmit (e) {
+      e.preventDefault()
+      this.form.validateFields((err) => {
+        if (!err) {
+          const url = this.form.getFieldValue('url');
+          const email = this.form.getFieldValue('email');
+          const status = this.form.getFieldValue('status');
+          const deleted = this.form.getFieldValue('deleted');
+
+          if(url!=""){
+            this.url=url;
+          }
+          else{
+            this.username=null;
+          }
+          if(email!=""){
+            this.email=email;
+          }
+          else{
+            this.email=null;
+          }
+          if(status!=""){
+            this.status=status;
+          }
+          else{
+            this.status=null;
+          }
+          if(deleted!=""){
+            this.deleted=deleted;
+          }
+          else{
+            this.deleted=null;
+          }
+          this.loadData(this.url,this.email,this.userId,this.status,this.deleted);
+        }
+      })
+    },
+
     toggleAdvanced () {
       this.advanced = !this.advanced
     },
     remove () {
-      this.dataSource = this.dataSource.filter(item => this.selectedRows.findIndex(row => row.key === item.key) === -1)
+      this.dataSource = this.dataSource.filter(item => this.selectedRows.findIndex(row => row.id === item.id) === -1)
       this.selectedRows = []
     },
-    onClear() {
-      this.$message.info('您清空了勾选的所有行')
-    },
-    onStatusTitleClick() {
-      this.$message.info('你点击了状态栏表头')
-    },
-    onChange() {
-      this.$message.info('表格状态改变了')
+    onChange({current,pageSize}) {
+      this.current=current;
+      this.pageSize=pageSize;
+      this.loadData();
     },
     onSelectChange() {
       this.$message.info('选中行改变了')
-    },
-    addNew () {
-      this.dataSource.unshift({
-        key: this.dataSource.length,
-        no: 'NO ' + this.dataSource.length,
-        description: '这是一段描述',
-        callNo: Math.floor(Math.random() * 1000),
-        status: Math.floor(Math.random() * 10) % 4,
-        updatedAt: '2018-07-26'
-      })
     },
     handleMenuClick (e) {
       if (e.key === 'delete') {

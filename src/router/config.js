@@ -49,11 +49,6 @@ const options = {
               },
               component: () => import('@/pages/dashboard/workplace'),
             },
-            {
-              path: 'analysis',
-              name: '分析页',
-              component: () => import('@/pages/dashboard/analysis'),
-            }
           ]
         },
 
@@ -87,6 +82,14 @@ const options = {
               },
               component: () => import('@/views/copyrightcommit/list/CopyrightCommitQueryList'),
             },
+            {
+              path: 'detail/:id',
+              name: '版权请求信息详情',
+              meta: {
+                invisible: true,
+              },
+              component: () => import('@/views/copyrightcommit/detail/CopyrightCommitDetail'),
+            }
           ]
         },
         {
@@ -132,16 +135,19 @@ const options = {
             },
             {
               path: 'detail/:id',
-              name: '查询详情',
+              name: '用户详情',
               meta: {
-                invisible: true
+                authority: {
+                  role:["admin"],
+                },
+                invisible: true,
               },
-              component: () => import('@/pages/Demo')
+              component: () => import('@/views/user/detail/UserDetail')
             }
           ]
         },
         {
-          path: 'verify',
+          path: 'audit',
           name: '审核管理',
           meta: {
             icon: 'table',
@@ -162,7 +168,20 @@ const options = {
                 },
                 authority: {
                   role:["admin","audit"],
-                  permission:["request:updatestatus"]
+                },
+              },
+            },
+            {
+              path: 'detail/:id',
+              name: '审核列表详细数据',
+              component: () => import('@/views/verify/detail/VerifyDetail'),
+              meta: {
+                icon: 'table',
+                page: {
+                  cacheAble: false
+                },
+                authority: {
+                  role:["admin","audit"],
                 },
               },
             },
@@ -180,15 +199,7 @@ const options = {
               },
               component: () => import('@/views/verify/loglist/VerifyLogQueryList'),
             },
-            {
-              path: 'query/detail/:id',
-              name: '查询详情',
-              meta: {
-                highlight: '/list/query',
-                invisible: true
-              },
-              component: () => import('@/pages/Demo')
-            }
+
           ]
         },
 
