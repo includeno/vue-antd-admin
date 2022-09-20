@@ -162,7 +162,7 @@ const options = {
           meta: {
             icon: 'table',
             authority: {
-              role:["admin","audit"],
+              role:["admin","staff"],
             },
           },
           component: PageView,
@@ -177,7 +177,7 @@ const options = {
                   cacheAble: false
                 },
                 authority: {
-                  role:["admin","audit"],
+                  role:["admin","staff"],
                 },
               },
             },
@@ -191,8 +191,23 @@ const options = {
                   cacheAble: false
                 },
                 authority: {
+                  role:["admin","staff"],
+                },
+              },
+            },
+            {
+              path: 'update/:id',
+              name: '审核页',
+              component: () => import('@/views/verify/update/VerifyUpdateForm'),
+              meta: {
+                icon: 'table',
+                page: {
+                  cacheAble: false
+                },
+                authority: {
                   role:["admin","audit"],
                 },
+                invisible: true,
               },
             },
             {

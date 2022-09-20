@@ -14,6 +14,8 @@ module.exports = {
   //copyright
   COPYRIGHT_REQUEST: `${BASE_URL}/copyrightcommit`,//添加请求 修改请求 删除请求
   COPYRIGHT_REQUEST_LIST:`${BASE_URL}/copyrightcommits/page`,//查询请求
+  COPYRIGHT_REQUEST_AUDIT: `${BASE_URL}/copyrightcommit/audit`,
+
   COPYRIGHT_LIST: `${BASE_URL}/copyrights/page`,//查询记录
 
   ROUTES: `${BASE_URL}/routes`,

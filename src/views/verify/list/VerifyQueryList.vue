@@ -106,10 +106,6 @@ const columns = [
     dataIndex: 'status',
   },
   {
-    title: '平台',
-    dataIndex: 'platform',
-  },
-  {
     title: '创建时间',
     dataIndex: 'createTime',
   },
@@ -124,13 +120,13 @@ const columns = [
 ]
 let timeout;
 
-function getCopyrightCommitListByPage(callback,current,size,{url,email,userId,status,deleted}) {
+function getCopyrightCommitListByPage(callback,current,size,{url,status,deleted}) {
   if (timeout) {
     clearTimeout(timeout);
     timeout = null;
   }
-  function loadData(current,size,{url,email,userId,status,deleted}) {
-    CopyrightCommitService.getCopyrightRequestListByPage(current,size,{url,email,userId,status,deleted}).then((response)=>{
+  function loadData(current,size,{url,status,deleted}) {
+    CopyrightCommitService.getCopyrightCommitListByPage(current,size,{url,status,deleted}).then((response)=>{
       if(response!=null && response.data.code>0){
         const records=response.data.data.records;
         const totals=response.data.data.total;
@@ -163,7 +159,7 @@ function getCopyrightCommitListByPage(callback,current,size,{url,email,userId,st
       }
     });
   }
-  timeout = setTimeout(loadData(current,size,{url:url,email:email,userId:userId,status:status,deleted:deleted}), 300);
+  timeout = setTimeout(loadData(current,size,{url:url,status:status,deleted:deleted}), 300);
 }
 
 export default {
@@ -174,10 +170,6 @@ export default {
       user:this.$store.getters["account/user"],
       form: this.$form.createForm(this),
       url:undefined,
-      email:undefined,
-      userId:-1,
-      status:undefined,
-      deleted:undefined,
 
       advanced: true,
       columns: columns,
@@ -194,32 +186,17 @@ export default {
   },
   authorize: {
       deleteRecord: {
-        role:["admin","audit"],
+        role:["admin","staff"],
       }
   },
   mounted() {
-    let roles=this.$store.getters["account/roles"];
-    let rolecode=""
-    for(let index in roles){
-      if(roles[index].code=='admin'||roles[index].code=='audit'){
-        rolecode=roles[index].code;
-        break;
-      }
-    }
-    if(rolecode!=""){
-      this.userId=-1;
-    }
-    else{
-      let user=this.$store.getters["account/user"];
-      this.userId=user.id;
-    }
-    this.loadData(null,null,this.userId,null,null);
+    const url = this.form.getFieldValue('url');
+    const status = this.form.getFieldValue('status');
+    const deleted = this.form.getFieldValue('deleted');
+    this.loadPageData(url,status,deleted)
   },
   methods: {
-    loadData(url,email,userId,status,deleted){
-      if(userId==-1){
-        userId=null;
-      }
+    loadPageData(url,status,deleted){
       getCopyrightCommitListByPage((data,totals) => {
         this.dataSource=data;
         this.total=totals;
@@ -228,29 +205,16 @@ export default {
           pageSize:10,
           showTotal: total => `Total ${total} items`, // 显示总数
         }
-      },this.current,this.pageSize,{url:url,email:email,userId:userId,status:status,deleted:deleted});
+      },this.current,this.pageSize,{url:url,status:status,deleted:deleted});
     },
     onSubmit (e) {
       e.preventDefault()
       this.form.validateFields((err) => {
         if (!err) {
           const url = this.form.getFieldValue('url');
-          const email = this.form.getFieldValue('email');
           const status = this.form.getFieldValue('status');
           const deleted = this.form.getFieldValue('deleted');
 
-          if(url!=""){
-            this.url=url;
-          }
-          else{
-            this.username=null;
-          }
-          if(email!=""){
-            this.email=email;
-          }
-          else{
-            this.email=null;
-          }
           if(status!=""){
             this.status=status;
           }
@@ -263,7 +227,7 @@ export default {
           else{
             this.deleted=null;
           }
-          this.loadData(this.url,this.email,this.userId,this.status,this.deleted);
+          this.loadPageData(url,this.status,this.deleted);
         }
       })
     },

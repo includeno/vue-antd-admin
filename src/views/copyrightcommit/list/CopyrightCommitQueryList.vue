@@ -197,14 +197,14 @@ export default {
   },
   authorize: {
       deleteRecord: {
-        role:["admin","audit"],
+        role:["admin","staff"],
       }
   },
   mounted() {
     let roles=this.$store.getters["account/roles"];
     let rolecode=""
     for(let index in roles){
-      if(roles[index].code=='admin'||roles[index].code=='audit'){
+      if(roles[index].code=='admin'||roles[index].code=='staff'){
         rolecode=roles[index].code;
         break;
       }

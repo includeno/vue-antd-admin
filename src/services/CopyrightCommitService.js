@@ -1,4 +1,4 @@
-import {COPYRIGHT_REQUEST,COPYRIGHT_REQUEST_LIST} from '@/services/api'
+import {COPYRIGHT_REQUEST,COPYRIGHT_REQUEST_LIST,COPYRIGHT_REQUEST_AUDIT} from '@/services/api'
 import {request, METHOD} from '@/utils/request'
 
 
@@ -6,7 +6,7 @@ import {request, METHOD} from '@/utils/request'
  * 获取版权信息申请
  * @returns {Promise<AxiosResponse<T>>}
  */
-export async function getCopyrightRequest(id) {
+export async function getCopyrightCommit(id) {
     return request(COPYRIGHT_REQUEST, METHOD.GET,{id:id});
 }
 
@@ -14,12 +14,10 @@ export async function getCopyrightRequest(id) {
  * 提交新的版权信息申请
  * @returns {Promise<AxiosResponse<T>>}
  */
-export async function addCopyrightRequest(userId,url,platform,platformHash,comment) {
+export async function addCopyrightCommit(userId,url,comment) {
     let formdata=new FormData();
     formdata.append("userId",userId);
     formdata.append("url",url);
-    formdata.append("platform",platform);
-    formdata.append("platformHash",platformHash);
     formdata.append("comment",comment);
 
     return request(COPYRIGHT_REQUEST, METHOD.POST, formdata);
@@ -29,18 +27,15 @@ export async function addCopyrightRequest(userId,url,platform,platformHash,comme
  * 修改版权信息申请
  * @returns {Promise<AxiosResponse<T>>}
  */
-export async function updateCopyrightRequest(id,userId,email,platform,platformHash,comment) {
+export async function updateCopyrightCommit(id,userId,status) {
     let formdata=new FormData();
     formdata.append("id",id);
     formdata.append("userId",userId);
-    formdata.append("email",email);
-    formdata.append("platform",platform);
-    formdata.append("platformHash",platformHash);
-    formdata.append("comment",comment);
+    formdata.append("status",status);
     return request(COPYRIGHT_REQUEST, METHOD.PUT, formdata);
 }
 
-export async function deleteCopyrightRequest(id, userId) {
+export async function deleteCopyrightCommit(id, userId) {
     return request(COPYRIGHT_REQUEST, METHOD.DELTET, {
         id:id,
         userId:userId,
@@ -51,22 +46,33 @@ export async function deleteCopyrightRequest(id, userId) {
  * 获取所有请求
  * @returns {Promise<AxiosResponse<T>>}
  */
-export async function getCopyrightRequestListByPage(page,size,{url,email,userId,status,deleted}) {
+export async function getCopyrightCommitListByPage(page,size,{url,status,deleted}) {
     return request(COPYRIGHT_REQUEST_LIST, METHOD.GET,{
         page:page,
         size:size,
-        email:email,
-        userId:userId,
         url:url,
         status:status,
         deleted:deleted,
     })
 }
 
+/**
+ * 修改版权信息申请
+ * @returns {Promise<AxiosResponse<T>>}
+ */
+export async function audit(id,auditId,status) {
+    let formdata=new FormData();
+    formdata.append("id",id);
+    formdata.append("auditId",auditId);
+    formdata.append("status",status);
+    return request(COPYRIGHT_REQUEST_AUDIT, METHOD.PUT, formdata);
+}
+
 export default {
-    getCopyrightRequest,
-    addCopyrightRequest,
-    updateCopyrightRequest,
-    deleteCopyrightRequest,
-    getCopyrightRequestListByPage,
+    getCopyrightCommit,
+    addCopyrightCommit,
+    updateCopyrightCommit,
+    deleteCopyrightCommit,
+    getCopyrightCommitListByPage,
+    audit,
 }
